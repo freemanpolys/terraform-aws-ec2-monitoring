@@ -1,3 +1,11 @@
+data "aws_iam_policy" "ssm_full_access" {
+  name = "AmazonSSMFullAccess"
+}
+
+data "aws_iam_policy" "cloudwatch_full_access" {
+  name = "CloudWatchFullAccessV2"
+}
+
 resource "aws_iam_role" "ec2_cloudwatch_role" {
   name = var.role_name
   assume_role_policy = jsonencode({
@@ -12,17 +20,18 @@ resource "aws_iam_role" "ec2_cloudwatch_role" {
       },
     ]
   })
-
-  inline_policy {
-    name = "AmazonSSMFullAccess"
-    policy = file("${path.module}/files/ssm_full_access.json")
-  }
-    inline_policy {
-    name = "CloudWatchFullAccessV2"
-    policy = file("${path.module}/files/cloudwatch_full_access_v2.json")
-  }
     tags = merge(tomap({
      "Name" = var.role_name,
      "CreateBy" = "Terraform"
    }), var.tags)
+}
+
+resource "aws_iam_role_policy_attachment" "ssm_full_access" {
+  role       = aws_iam_role.ec2_cloudwatch_role.name
+  policy_arn = data.aws_iam_policy.ssm_full_access.arn
+}
+
+resource "aws_iam_role_policy_attachment" "cloudwatch_full_access" {
+  role       = aws_iam_role.ec2_cloudwatch_role.name
+  policy_arn = data.aws_iam_policy.cloudwatch_full_access.arn
 }
