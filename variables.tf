@@ -1,4 +1,4 @@
-variable "role_name" {
+variable "ec2_role_name" {
     type = string
     default = "EC2-CloudWatch-Role"
     description = "EC2 CloudWatch Role name"
